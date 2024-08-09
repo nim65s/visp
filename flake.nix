@@ -3,7 +3,7 @@
 
   inputs = {
     flake-utils.url = "github:numtide/flake-utils";
-    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    nixpkgs.url = "github:nim65s/nixpkgs/cxxheaderparser";
   };
 
   outputs =
@@ -13,9 +13,15 @@
       let
         pkgs = nixpkgs.legacyPackages.${system};
         visp = pkgs.callPackage ./default.nix { };
+        py-visp = pkgs.python3Packages.toPythonModule (visp.override {
+          pythonSupport = true;
+        });
       in
       {
-        packages.default = visp;
+        packages = {
+          inherit visp;
+          default = py-visp;
+        };
       }
     );
 }

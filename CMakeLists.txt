@@ -340,6 +340,11 @@ endif()
 if(DEFINED ENV{VIRTUAL_ENV} OR DEFINED ENV{CONDA_PREFIX})
   set(_pip_args)
   set(VISP_PYTHON_IS_SYSTEM_WIDE FALSE)
+elseif(DEFINED PYTHON_PREFIX)
+  # Users who want to just install visp python bindings in arbitrary prefix
+  # without other python dependencies can use this
+  set(_pip_args "--no-deps" "--prefix" ${PYTHON_PREFIX} "-vvv")
+  set(VISP_PYTHON_IS_SYSTEM_WIDE FALSE)
 else()
   # First solution: raise an error when cmake will call pip install
   # set(_pip_args "--require-virtualenv") # If this is a system python, throw an error

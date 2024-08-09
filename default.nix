@@ -8,6 +8,7 @@
 # visp>   315 |     if (!mRoot->showConfigDialog()) {
 # visp>       |          ~~~~~~~~~~~~~~~~~~~~~~~^~
 {
+  breakpointHook,
   cmake,
   coin3d,
   darwin,
@@ -30,6 +31,7 @@
   openblas,
   opencv,
   pkg-config,
+  pythonSupport ? false,
   python3Packages,
   stdenv,
   texliveSmall,
@@ -46,6 +48,7 @@ stdenv.mkDerivation (finalAttrs: {
   src = nix-gitignore.gitignoreSource [ ./.nixignore ] ./.;
 
   nativeBuildInputs = [
+    breakpointHook
     cmake
     doxygen
     pkg-config
@@ -68,7 +71,6 @@ stdenv.mkDerivation (finalAttrs: {
       #ogre
       openblas
       opencv
-      python3Packages.numpy
       xorg.libpthreadstubs
       zbar
       zlib
@@ -77,7 +79,23 @@ stdenv.mkDerivation (finalAttrs: {
       coin3d
       v4l-utils
     ]
-    ++ lib.optionals stdenv.isDarwin [ darwin.IOKit ];
+    ++ lib.optionals stdenv.isDarwin [ darwin.IOKit ]
+    ++ lib.optionals pythonSupport [
+      python3Packages.cxxheaderparser
+      python3Packages.lxml
+      python3Packages.numpy
+      python3Packages.pcpp
+      python3Packages.pip
+      python3Packages.pybind11
+      python3Packages.pytest
+      python3Packages.tqdm
+    ];
+
+  cmakeFlags = lib.optionals pythonSupport [
+    "-DPYTHON_PREFIX=$out"
+  ];
+
+  postConfigure = "exit 1";
 
   doCheck = true;
 
